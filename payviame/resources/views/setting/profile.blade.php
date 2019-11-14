@@ -1,0 +1,280 @@
+@extends('layouts.dashboard')
+
+@section('title', __('My Profile'))
+
+@push('stylesheets')
+    <style type="text/css">
+
+        #main {
+            min-height: 600px;
+            background-color: #f5f0ea;
+        }
+        #middle {
+            padding: 30px 50px;
+            background: transparent;
+        }
+        .container {
+            min-width: 950px;
+            max-width: 1200px;
+        }
+        #settings_navigation {
+            width: 200px;
+            float: left;
+            font-size: 14px;
+            position: relative;
+        }
+        #settings_navigation ul {
+            margin: 0;
+            padding: 15px 0;
+            overflow: hidden;
+            position: relative;
+            border-right: 1px solid #c2c2c2;
+        }
+        #settings_navigation li.heading {
+            margin: 8px 0 0 0;
+            padding: 8px 0;
+            font-weight: 600;
+            color: #41829c;
+        }
+        #settings_navigation ul li {
+            display: block;
+            line-height: 18px;
+            border-bottom: 1px solid #d8d8d8;
+        }
+        #settings_navigation a {
+            display: block;
+            padding: 5px;
+            color: #808080;
+            transition-property: all;
+            transition-duration: 0.2s;
+            transition-timing-function: ease;
+        }
+        #settings_navigation li.current a {
+            color: #000000;
+            font-weight: bold;
+            padding-left: 5px;
+            background: rgba(0,0,0,0.05);
+        }
+        #settings_navigation ul:after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 96%;
+            position: absolute;
+            top: 2%;
+            right: -100px;
+            background: transparent;
+            border-radius: 100px;
+            box-shadow: 0 0 35px 0 rgba(0,0,0,0.15);
+        }
+
+        .container1 input[type=text], input[type=file], select {
+          width: 50% !important;
+          padding: 12px 20px;
+          margin: 8px 0;
+          display: block;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-sizing: border-box;
+        }
+
+        .container1 input[type=submit] {
+          width: 50%;
+          background-color: #1a1a1a;
+          color: white;
+          padding: 10px 20px;
+          margin: 8px 0;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 20px;
+        }
+
+        .container1 input[type=submit]:hover {
+          background-color: #45a049;
+        }
+
+        div.container1 {
+          border-radius: 5px;
+          background-color: #ffffff;
+          padding: 20px;
+            margin-left: 252px;
+        }
+
+        .container1 label{
+            color: #444;
+            font-size: 13px;
+            /*height: 46px;
+            line-height: 46px;*/
+            font-weight: bold;
+        }
+
+        span.field-desc {
+            display: block;
+            color: #888;
+            font-size: 0.9em;
+            padding: 5px 0 10px 3px;
+        }
+        .title {
+            height: 55px;
+            line-height: 45px;
+            padding: 15px;
+            background-color: #fcfaf8;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-width: 0 0 1px 0;
+            border-radius: 3px 3px 0 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+            margin-left: 252px;
+        }
+
+        .title h2{
+            color: #415664;
+            font-size: 20px;
+            font-weight: 600;
+            text-transform: none;
+            text-shadow: 0 1px 0 white;
+        }
+
+    </style>
+@endpush
+
+@section('content')
+
+    <div id="main">
+        <div id="middle">
+            <div class="container">
+
+                <div id="settings_navigation">
+                    <ul>
+                        <li class="heading">About Me</li>
+                        <li class="current">
+                            <a href="{{ route('setting.profile.index',$user->profile->id) }}">My Profile</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('setting.password.index') }}">My Password</a>
+                        </li>
+                        @if($user->role_id != 1)
+                        <li class="heading">Invoices &amp; Quotes</li>
+                        <li>
+                            <a href="{{ route('setting.performence.index') }}">Performence</a>
+                        </li>
+                        @endif
+                        @if($user->role_id == 1)
+                        <li class="heading">Account</li>
+                        <li>
+                            <a href="{{ route('setting.business.detail') }}">Business Details</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('report.membership') }}">Membership Plans</a>
+                        </li>
+                        <li class="heading">Invoices &amp; Quotes</li>
+                        <li>
+                            <a href="{{ route('setting.default.index') }}">Default</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('setting.inventory.index') }}">Inventory</a>
+                        </li>
+                        @endif
+                        <li class="heading">Team</li>
+                        <li>
+                            <a href="{{ route('team.index')}} ">Team Members</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('team.create') }}">Invite Member</a>
+                        </li>
+                        <!-- <li class="heading">Extensions</li> -->
+                    </ul>
+                </div>
+
+                <div class="title">
+                    <!-- <h2>Profile</h2> -->
+                    <div style="margin-top: -10px">
+                        <span style="font-size: 20px">Profile</span>
+                        @if($user->role_id == 1)
+                            <div style="float: right">
+                                <form id="delete-form-{{$profile->id}}" action="{{ route('setting.account.destroy',$profile->id) }}" style="display: none;" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="if(confirm('Are you sure? You want to delete account? All your information including quotes and invoices will be deleted from our system.')){
+                                    event.preventDefault();
+                                    document.getElementById('delete-form-{{$profile->id}}').submit();
+                                }else {
+                                    event.preventDefault();
+                                        }"><i class="fa fa-trash "></i> Close Account </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="container1">
+                    @if($user->id == $profile->user_id)
+                        <form method="POST" action="{{ route('setting.profile.update', $profile->id) }}" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div style="padding-left: 65px;">
+                                <label for="name">Your Name</label>
+                                <input type="text" id="name" name="name" value="{{ $profile->user->name }}" placeholder="Your name.." required>
+                                <span class="field-desc">Your first name will do. This is just what we'll call you.</span>
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <label for="email">Your email</label>
+                                <input type="text" id="email" name="email" value="{{ $profile->user->email }}" placeholder="Your email id.." required >
+                                <span class="field-desc">This is also your account login. We won't spam you or share your address.</span>
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <label for="lname"></label>
+                                <br>
+                                <img src="{{asset($profile->user_avatar)}}" height="100">
+                                <input type="file" name="user_avatar" accept="image/*" >
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <input type="submit" value="Save My Settings" >
+                            </div>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('setting.profile.update', $profile->id) }}" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <div style="padding-left: 65px;">
+                                <label for="name">Your Name</label>
+                                <input type="text" id="name" name="name" value="{{ $profile->user->name }}" placeholder="Your name.." required >
+                                <span class="field-desc">Your first name will do. This is just what we'll call you.</span>
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <label for="email">Your email</label>
+                                <input type="text" id="email" name="email" value="{{ $profile->user->email }}" placeholder="Your email id.." disabled required >
+                                <span class="field-desc">This is also your account login. We won't spam you or share your address.</span>
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <label for="lname"></label>
+                                <br>
+                                <img src="{{asset($profile->user_avatar)}}" height="100">
+                                <input type="file" name="user_avatar" accept="image/*" >
+                            </div>
+                            <hr>
+                            <div style="padding-left: 65px;">
+                                <input type="submit" value="Change Settings" >
+                            </div>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $("#flip").click(function() {
+                $("#panel").slideToggle("slow");
+            });
+        });
+    </script>
+@endpush
